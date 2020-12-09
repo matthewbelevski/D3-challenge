@@ -86,6 +86,15 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
   return circlesGroup;
 }
 
+function renderCirclesLabelX(newXScale, chosenXAxis, circleLabels) {
+
+    circleLabels.transition()
+      .duration(1000)
+      .attr("x", d => newXScale(d[chosenXAxis]));
+  
+    return circleLabels;
+  }
+
 
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
@@ -95,6 +104,16 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
   
     return circlesGroup;
   }
+
+  function renderCirclesLabelY(newYScale, chosenYAxis, circleLabels) {
+
+    circleLabels.transition()
+      .duration(1000)
+      .attr("y", d => newYScale(d[chosenYAxis]));
+  
+    return circleLabels;
+  }
+  
 
 // function used for updating circles group with new tooltip
 function updateToolTip(chosenXAxis, circlesGroup) {
@@ -117,7 +136,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
       labely = "Healthcare: ";
     }
     else if (chosenYAxis === "smokes") {
-      labely = `"Smokes: ${d[chosenYAxis]}"`;
+      labely = `"Smokes: "`;
     }
     else {
       labely = "Obesitiy: ";
@@ -231,6 +250,18 @@ d3.csv("assets/data/data.csv").then(function(dataj, err) {
     .attr("fill", "#3BB2E2")
     .attr("opacity", ".5")
     //.text("abbr");
+
+var circleLabels = chartGroup.selectAll(null)
+.data(dataj)
+.enter()
+.append("text")
+.attr("x", d => xLinearScale(d[chosenXAxis]))
+.attr("y", d => yLinearScale(d[chosenYAxis]))
+  .text(d => d.abbr)
+  .attr("font-family", "sans-serif")
+  .attr("font-size", "10px")
+  .attr("text-anchor", "middle")
+  .attr("fill", "white");
  
 
   // Create group for three x-axis labels
@@ -378,6 +409,8 @@ var smokesLabel = yLabelsgroup.append("text")
 
       // updates circles with new y values
       circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
+
+      circleLabels = renderCirclesLabelY(circleLabels, yLinearScale, chosenYAxis);
 
       // updates tooltips with new info
       circlesGroup = updateToolTipY(chosenYAxis, circlesGroup);
