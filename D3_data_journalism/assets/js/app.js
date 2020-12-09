@@ -45,7 +45,7 @@ function xScale(dataj, chosenXAxis) {
 function yScale(dataj, chosenYAxis) {
   // create scales
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(dataj, d => d[chosenYAxis])])
+    .domain([d3.min(dataj, d => d[chosenYAxis] -5), d3.max(dataj, d => d[chosenYAxis] *1.2)])
     .range([height, 0]);
 
   return yLinearScale;
@@ -129,6 +129,40 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 
   return circlesGroup;
 }
+
+function updateToolTipY(chosenYAxis, circlesGroup) {
+
+    var label;
+  
+    if (chosenXAxis === "healthcare") {
+      label = "Healthcare";
+    }
+    else if (chosenXAxis === "smokes") {
+      label = "smokes";
+    }
+    else {
+      label = "Obesitiy";
+    }
+  
+    var toolTip = d3.tip()
+      .attr("class", "tooltip")
+      .offset([80, -60])
+      .html(function(d) {
+        return (`${d.state}<br>${label} ${d[chosenYAxis]}`);
+      });
+  
+    circlesGroup.call(toolTip);
+  
+    circlesGroup.on("mouseover", function(data) {
+      toolTip.show(data);
+    })
+      // onmouseout event
+      .on("mouseout", function(data, index) {
+        toolTip.hide(data);
+      });
+  
+    return circlesGroup;
+  }
 
 // Retrieve data from the CSV file and execute everything below
 d3.csv("assets/data/data.csv").then(function(dataj, err) {
