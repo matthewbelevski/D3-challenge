@@ -1,4 +1,4 @@
-// @TODO: YOUR CODE HERE!
+//sets the width, heigh and margin of svg
 var svgWidth = 960;
 var svgHeight = 700;
 
@@ -12,7 +12,7 @@ var margin = {
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
 
-// Create an SVG wrapper, append an SVG group that will hold our chart,
+// Create an SVG wrapper, append an SVG group that will hold the chart,
 // and shift the latter by left and top margins.
 var svg = d3
   .select("#scatter")
@@ -24,12 +24,12 @@ var svg = d3
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-// Initial Params
+// Initial Params for x and y axis
 var chosenXAxis = "poverty";
 
 var chosenYAxis = "healthcare";
 
-// function used for updating x-scale var upon click on axis label
+// function used for updating x-scale var upon click on x axis label
 function xScale(dataj, chosenXAxis) {
   // create scales
   var xLinearScale = d3.scaleLinear()
@@ -42,6 +42,7 @@ function xScale(dataj, chosenXAxis) {
 
 }
 
+// function used for updating y-scale var upon click on y axis label
 function yScale(dataj, chosenYAxis) {
   // create scales
   var yLinearScale = d3.scaleLinear()
@@ -52,7 +53,7 @@ function yScale(dataj, chosenYAxis) {
 
 }
 
-// function used for updating xAxis var upon click on axis label
+// function used for updating xAxis var upon click on x axis label
 function renderAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
 
@@ -63,6 +64,7 @@ function renderAxes(newXScale, xAxis) {
   return xAxis;
 }
 
+// function used for updating yAxis var upon click on y axis label
 function renderYAxes(newYScale, yAxis) {
     var leftAxis = d3.axisLeft(newYScale);
   
@@ -76,7 +78,7 @@ function renderYAxes(newYScale, yAxis) {
 
 
 // function used for updating circles group with a transition to
-// new circles
+// new circles for the x axis
 function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYAxis) {
 
   circlesGroup.transition()
@@ -95,7 +97,8 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
 //     return circleLabels;
 //   }
 
-
+// function used for updating circles group with a transition to
+// new circles for the y axis
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
     circlesGroup.transition()
@@ -107,7 +110,7 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
   function renderCircleLabelY(newYScale, chosenYAxis, circleLabels) {
 
-    chartGroup.selectAll(null).transition()
+    circleLabels.selectAll(null).transition()
       .duration(1000)
       .attr("y", d => newYScale(d[chosenYAxis]));
   
@@ -115,7 +118,7 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
   }
   
 
-// function used for updating circles group with new tooltip
+// function used for updating circles group with new tooltip based on the x axis label
 function updateToolTip(chosenXAxis, circlesGroup) {
   var lab = "";
   var labelx;
@@ -124,10 +127,12 @@ function updateToolTip(chosenXAxis, circlesGroup) {
   if (chosenXAxis === "poverty") {
     labelx = "Poverty: ";
     lab = "%";
+    var labx = "";
   }
   else if (chosenXAxis === "age") {
     labelx = "Age: ";
     lab = "";
+    var labx = "";
   }
   else {
     labelx = "Household Income: ";
@@ -175,17 +180,21 @@ function updateToolTip(chosenXAxis, circlesGroup) {
   return circlesGroup;
 }
 
+// function used for updating circles group with new tooltip based on the y axis label
 function updateToolTipY(chosenYAxis, circlesGroup) {
   var lab = "";
   var labelx;
+  var labx = "";
 
   if (chosenXAxis === "poverty") {
     labelx = "Poverty: ";
     lab = "%";
+    var labx = "";
   }
   else if (chosenXAxis === "age") {
     labelx = "Age: ";
     lab = "";
+    var labx = "";
   }
   else {
     labelx = "Household Income: ";
@@ -292,7 +301,6 @@ var circleLabels = chartGroup.selectAll(null)
   .attr("text-anchor", "middle")
   .attr("fill", "white");
  
-
   // Create group for three x-axis labels
   var labelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${width / 2}, ${height + 20})`);
@@ -322,6 +330,7 @@ var circleLabels = chartGroup.selectAll(null)
   var yLabelsgroup = chartGroup.append("g")
     //.attr("transform", "rotate(-90)")
 
+    // Create group for three y-axis labels
  var healthcareLabel = yLabelsgroup.append("text")
     .attr("transform", "rotate(-90)")
     .attr("y", 40 - margin.left)
@@ -417,19 +426,18 @@ var smokesLabel = yLabelsgroup.append("text")
       }
     });
 
-    // x axis labels event listener
+    // y axis labels event listener
     yLabelsgroup.selectAll("text")
   .on("click", function() {
     // get value of selection
     var value = d3.select(this).attr("value");
     if (value !== chosenYAxis) {
 
-      // replaces chosenXAxis with value
+      // replaces chosenYAxis with value
       chosenYAxis = value;
 
       //console.log(chosenYAxis)
 
-      // functions here found above csv import
       // updates y scale for new data
       yLinearScale = yScale(dataj, chosenYAxis);
 
@@ -438,6 +446,8 @@ var smokesLabel = yLabelsgroup.append("text")
 
       // updates circles with new y values
       circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
+
+      //circleLabels = renderCircleLabelY(circleLabels, yLinearScale, chosenYAxis);
 
       // updates tooltips with new info
       circlesGroup = updateToolTipY(chosenYAxis, circlesGroup);
