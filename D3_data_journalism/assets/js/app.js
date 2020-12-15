@@ -86,14 +86,14 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
   return circlesGroup;
 }
 
-function renderCirclesLabelX(newXScale, chosenXAxis, circleLabels) {
+// function renderCirclesLabelX(newXScale, chosenXAxis, circleLabels) {
 
-    circleLabels.transition()
-      .duration(1000)
-      .attr("x", d => newXScale(d[chosenXAxis]));
+//     circleLabels.transition()
+//       .duration(1000)
+//       .attr("x", d => newXScale(d[chosenXAxis]));
   
-    return circleLabels;
-  }
+//     return circleLabels;
+//   }
 
 
 function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
@@ -105,9 +105,9 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
     return circlesGroup;
   }
 
-  function renderCirclesLabelY(newYScale, chosenYAxis, circleLabels) {
+  function renderCircleLabelY(newYScale, chosenYAxis, circleLabels) {
 
-    circleLabels.transition()
+    chartGroup.selectAll(null).transition()
       .duration(1000)
       .attr("y", d => newYScale(d[chosenYAxis]));
   
@@ -117,35 +117,49 @@ function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
 
 // function used for updating circles group with new tooltip
 function updateToolTip(chosenXAxis, circlesGroup) {
-
+  var lab = "";
   var labelx;
+  var labx = "";
 
   if (chosenXAxis === "poverty") {
     labelx = "Poverty: ";
+    lab = "%";
   }
   else if (chosenXAxis === "age") {
     labelx = "Age: ";
+    lab = "";
   }
   else {
-    labelx = "Household Income: $";
+    labelx = "Household Income: ";
+    lab = "";
+    labx ="$";
   }
   
   var labely;
   
     if (chosenYAxis === "healthcare") {
       labely = "Healthcare: ";
+      laby = "%";
     }
     else if (chosenYAxis === "smokes") {
-      labely = `"Smokes: "`;
+      labely = "Smokes: ";
+      laby = "%";
     }
     else {
       labely = "Obesitiy: ";
+      laby = "%";
     }
   var toolTip = d3.tip()
-    .attr("class", "tooltip")
-    .offset([80, -40])
+  .style("background-color", "black")
+  .style("padding", "8px")
+  .attr("class", "tooltip")
+  .attr("font-family", "sans-serif")
+  .style("font-size", "12px")
+  .style("color", "white")
+  .style("text-align", "center")
+  .offset([80, -40])
     .html(function(d) {
-      return (`${d.state}<br>${labelx} ${d[chosenXAxis]}<br>${labely} ${d[chosenYAxis]}`);
+      return (`${d.state}<br>${labelx} ${labx}${d[chosenXAxis]}${lab}<br>${labely} ${d[chosenYAxis]}${laby}`);
     });
 
   circlesGroup.call(toolTip);
@@ -162,35 +176,48 @@ function updateToolTip(chosenXAxis, circlesGroup) {
 }
 
 function updateToolTipY(chosenYAxis, circlesGroup) {
+  var lab = "";
+  var labelx;
 
-    var labelx;
-
-    if (chosenXAxis === "poverty") {
-      labelx = "Poverty: ";
+  if (chosenXAxis === "poverty") {
+    labelx = "Poverty: ";
+    lab = "%";
+  }
+  else if (chosenXAxis === "age") {
+    labelx = "Age: ";
+    lab = "";
+  }
+  else {
+    labelx = "Household Income: ";
+    lab = "";
+    labx ="$";
+  }
+  
+  var labely;
+  
+    if (chosenYAxis === "healthcare") {
+      labely = "Healthcare: ";
+      laby = "%";
     }
-    else if (chosenXAxis === "age") {
-      labelx = "Age: ";
+    else if (chosenYAxis === "smokes") {
+      labely = "Smokes: ";
+      laby = "%";
     }
     else {
-      labelx = "Household Income: $";
+      labely = "Obesitiy: ";
+      laby = "%";
     }
-    
-    var labely;
-    
-      if (chosenYAxis === "healthcare") {
-        labely = "Healthcare: ";
-      }
-      else if (chosenYAxis === "smokes") {
-        labely = "Smokes: ";
-      }
-      else {
-        labely = "Obesitiy: ";
-      }
     var toolTip = d3.tip()
+      .style("background-color", "black")
+      .style("padding", "8px")
       .attr("class", "tooltip")
+      .attr("font-family", "sans-serif")
+      .style("font-size", "12px")
+      .style("color", "white")
+      .style("text-align", "center")
       .offset([80, -40])
       .html(function(d) {
-        return (`${d.state}<br>${labelx} ${d[chosenXAxis]}<br>${labely} ${d[chosenYAxis]}`);
+        return (`${d.state}<br>${labelx} ${labx}${d[chosenXAxis]}${lab}<br>${labely} ${d[chosenYAxis]}${laby}`);
       });
   
     circlesGroup.call(toolTip);
@@ -246,11 +273,12 @@ d3.csv("assets/data/data.csv").then(function(dataj, err) {
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d[chosenYAxis]))
-    .attr("r", 10)
+    .attr("r",10)
     .attr("fill", "#3BB2E2")
     .attr("opacity", ".5")
     //.text("abbr");
 
+    //append circle labels
 var circleLabels = chartGroup.selectAll(null)
 .data(dataj)
 .enter()
@@ -259,7 +287,8 @@ var circleLabels = chartGroup.selectAll(null)
 .attr("y", d => yLinearScale(d[chosenYAxis]))
   .text(d => d.abbr)
   .attr("font-family", "sans-serif")
-  .attr("font-size", "10px")
+  .attr("font-size", "8px")
+  .attr("font-weight", "bold")
   .attr("text-anchor", "middle")
   .attr("fill", "white");
  
@@ -410,8 +439,6 @@ var smokesLabel = yLabelsgroup.append("text")
       // updates circles with new y values
       circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
 
-      circleLabels = renderCirclesLabelY(circleLabels, yLinearScale, chosenYAxis);
-
       // updates tooltips with new info
       circlesGroup = updateToolTipY(chosenYAxis, circlesGroup);
 
@@ -450,6 +477,7 @@ var smokesLabel = yLabelsgroup.append("text")
           .classed("inactive", false);
       }
     }
+
   });
 }).catch(function(error) {
   console.log(error);
