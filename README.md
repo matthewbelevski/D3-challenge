@@ -4,5 +4,5 @@ For the D3-Challenge the task was to create a scatter plot between the rates of 
 
 In order to do this, we needed to use HTML, JavaScript and specifically the library D3 in order to create an interactive scatter plot that is able to change its X and Y axis when selecting the labels.
 
-Another feature of the scatterplot is a D3 tip that displays the x and y data for that particular datapoint based on the x and y label chosen.
+Another feature of the scatterplot is a D3 tip that displays the X and Y data for that particular datapoint based on the X and Y label chosen.
 
